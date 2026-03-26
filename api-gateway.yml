@@ -1,0 +1,75 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: auth-service
+              uri: lb://AUTH-SERVICE
+              predicates:
+                - Path=/auth/**
+            - id: user-service
+              uri: lb://USER-SERVICE
+              predicates:
+                - Path=/users/**
+            - id: startup-service
+              uri: lb://STARTUP-SERVICE
+              predicates:
+                - Path=/startups/**
+            - id: investment-service
+              uri: lb://INVESTMENT-SERVICE
+              predicates:
+                - Path=/investments/**
+            - id: team-service
+              uri: lb://TEAM-SERVICE
+              predicates:
+                - Path=/teams/**
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: auth-service
+        url: /auth/v3/api-docs
+      - name: user-service
+        url: /users/v3/api-docs
+      - name: startup-service
+        url: /startups/v3/api-docs
+      - name: investment-service
+        url: /investments/v3/api-docs
+      - name: team-service
+        url: /teams/v3/api-docs
+
+server:
+  port: 8085
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      productService:
+        failure-rate-threshold: 50
+        minimum-number-of-calls: 5
+        wait-duration-in-open-state: 10s
+        sliding-window-size: 10
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+  tracing:
+    sampling:
+      probability: 1.0
+
+# zipkin:
+#   tracing:
+#     endpoint: http://localhost:9411/api/v2/spans
