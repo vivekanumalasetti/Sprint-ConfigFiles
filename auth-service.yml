@@ -19,10 +19,28 @@ spring:
     username: guest
     password: guest
 
+# JWT Configuration
 jwt:
   secret: FounderLinkSuperSecretKey2024ForJWT_AtLeast32Characters
+  expiration: 86400000
 
+# Eureka Client
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+# Zipkin & Tracing (Micrometer)
+management:
+  tracing:
+    sampling:
+      probability: 1.0   # capture all requests (dev mode)
+
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+# Actuator (optional but useful)
+management.endpoints.web.exposure.include: "*"
