@@ -5,6 +5,10 @@ spring:
   application:
     name: api-gateway
 
+  config:
+    import:
+      - optional:configserver:http://localhost:8888
+
   main:
     web-application-type: reactive
 
@@ -13,75 +17,123 @@ spring:
       server:
         webflux:
           routes:
+
+            # ================= NORMAL ROUTES =================
+
             - id: auth-service
               uri: lb://AUTH-SERVICE
               predicates:
                 - Path=/auth/**
-              filters:
-                - RewritePath=/auth/(?<path>.*), /${path}
 
             - id: user-service
               uri: lb://USER-SERVICE
               predicates:
                 - Path=/users/**
-              filters:
-                - RewritePath=/users/(?<path>.*), /${path}
 
             - id: startup-service
               uri: lb://STARTUP-SERVICE
               predicates:
                 - Path=/startups/**
-              filters:
-                - RewritePath=/startups/(?<path>.*), /${path}
 
             - id: investment-service
               uri: lb://INVESTMENT-SERVICE
               predicates:
                 - Path=/investments/**
-              filters:
-                - RewritePath=/investments/(?<path>.*), /${path}
 
             - id: team-service
               uri: lb://TEAM-SERVICE
               predicates:
                 - Path=/teams/**
-              filters:
-                - RewritePath=/teams/(?<path>.*), /${path}
 
             - id: message-service
               uri: lb://MESSAGE-SERVICE
               predicates:
                 - Path=/messages/**
-              filters:
-                - RewritePath=/messages/(?<path>.*), /${path}
 
             - id: notification-service
               uri: lb://NOTIFICATION-SERVICE
               predicates:
                 - Path=/notifications/**
-              filters:
-                - RewritePath=/notifications/(?<path>.*), /${path}
 
+
+            # ================= SWAGGER DOC ROUTES =================
+
+            - id: auth-docs
+              uri: lb://AUTH-SERVICE
+              predicates:
+                - Path=/v3/api-docs/auth
+              filters:
+                - RewritePath=/v3/api-docs/auth, /v3/api-docs
+
+            - id: user-docs
+              uri: lb://USER-SERVICE
+              predicates:
+                - Path=/v3/api-docs/user
+              filters:
+                - RewritePath=/v3/api-docs/user, /v3/api-docs
+
+            - id: startup-docs
+              uri: lb://STARTUP-SERVICE
+              predicates:
+                - Path=/v3/api-docs/startup
+              filters:
+                - RewritePath=/v3/api-docs/startup, /v3/api-docs
+
+            - id: investment-docs
+              uri: lb://INVESTMENT-SERVICE
+              predicates:
+                - Path=/v3/api-docs/investment
+              filters:
+                - RewritePath=/v3/api-docs/investment, /v3/api-docs
+
+            - id: team-docs
+              uri: lb://TEAM-SERVICE
+              predicates:
+                - Path=/v3/api-docs/team
+              filters:
+                - RewritePath=/v3/api-docs/team, /v3/api-docs
+
+            - id: message-docs
+              uri: lb://MESSAGE-SERVICE
+              predicates:
+                - Path=/v3/api-docs/message
+              filters:
+                - RewritePath=/v3/api-docs/message, /v3/api-docs
+
+            - id: notification-docs
+              uri: lb://NOTIFICATION-SERVICE
+              predicates:
+                - Path=/v3/api-docs/notification
+              filters:
+                - RewritePath=/v3/api-docs/notification, /v3/api-docs
+
+
+# ================= SWAGGER UI =================
 
 springdoc:
+  api-docs:
+    enabled: true
   swagger-ui:
+    enabled: true
     path: /swagger-ui.html
     urls:
       - name: Auth Service
-        url: /auth/v3/api-docs
+        url: /v3/api-docs/auth
       - name: User Service
-        url: /users/v3/api-docs
+        url: /v3/api-docs/user
       - name: Startup Service
-        url: /startups/v3/api-docs
+        url: /v3/api-docs/startup
       - name: Investment Service
-        url: /investments/v3/api-docs
+        url: /v3/api-docs/investment
       - name: Team Service
-        url: /teams/v3/api-docs
+        url: /v3/api-docs/team
       - name: Message Service
-        url: /messages/v3/api-docs
+        url: /v3/api-docs/message
       - name: Notification Service
-        url: /notifications/v3/api-docs
+        url: /v3/api-docs/notification
 
+
+# ================= EUREKA =================
 
 eureka:
   client:
@@ -91,6 +143,8 @@ eureka:
     prefer-ip-address: true
     hostname: localhost
 
+
+# ================= RESILIENCE =================
 
 resilience4j:
   circuitbreaker:
@@ -102,17 +156,20 @@ resilience4j:
         sliding-window-size: 10
 
 
+# ================= ACTUATOR =================
+
 management:
   endpoints:
     web:
       exposure:
         include: "*"
-
   tracing:
     sampling:
       probability: 1.0
 
-  # Uncomment when Zipkin is working
-  # zipkin:
-  #   tracing:
-  #     endpoint: http://localhost:9411/api/v2/spans
+
+# ================= ZIPKIN (OPTIONAL) =================
+
+# zipkin:
+#   tracing:
+#     endpoint: http://localhost:9411/api/v2/spans
