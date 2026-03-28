@@ -13,31 +13,76 @@ spring:
       server:
         webflux:
           routes:
+
+            # 🔐 AUTH SERVICE
             - id: auth-service
               uri: lb://AUTH-SERVICE
               predicates:
                 - Path=/auth/**
+              filters:
+                - RewritePath=/auth/(?<path>.*), /${path}
 
+            # 👤 USER SERVICE
             - id: user-service
               uri: lb://USER-SERVICE
               predicates:
                 - Path=/users/**
+              filters:
+                - RewritePath=/users/(?<path>.*), /${path}
 
+            # 🚀 STARTUP SERVICE
             - id: startup-service
               uri: lb://STARTUP-SERVICE
               predicates:
                 - Path=/startups/**
+              filters:
+                - RewritePath=/startups/(?<path>.*), /${path}
 
+            # 💰 INVESTMENT SERVICE
             - id: investment-service
               uri: lb://INVESTMENT-SERVICE
               predicates:
                 - Path=/investments/**
+              filters:
+                - RewritePath=/investments/(?<path>.*), /${path}
 
-            # - id: team-service
-            #   uri: lb://TEAM-SERVICE
-            #   predicates:
-            #     - Path=/teams/**
+            👥 TEAM SERVICE (UNCOMMENT WHEN READY)
+            - id: team-service
+              uri: lb://TEAM-SERVICE
+              predicates:
+                - Path=/teams/**
+              filters:
+                - RewritePath=/teams/(?<path>.*), /${path}
 
+            🔔 NOTIFICATION SERVICE (OPTIONAL)
+            - id: notification-service
+              uri: lb://NOTIFICATION-SERVICE
+              predicates:
+                - Path=/notifications/**
+              filters:
+                - RewritePath=/notifications/(?<path>.*), /${path}
+
+
+# 🔥 CENTRALIZED SWAGGER CONFIG
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: Auth Service
+        url: /auth/v3/api-docs
+      - name: User Service
+        url: /users/v3/api-docs
+      - name: Startup Service
+        url: /startups/v3/api-docs
+      - name: Investment Service
+        url: /investments/v3/api-docs
+      - name: Team Service
+        url: /teams/v3/api-docs
+      - name: Notification Service
+        url: /notifications/v3/api-docs
+
+
+# 🌐 EUREKA CONFIG
 eureka:
   client:
     service-url:
@@ -46,15 +91,19 @@ eureka:
     prefer-ip-address: true
     hostname: localhost
 
+
+# ⚡ RESILIENCE4J (CIRCUIT BREAKER)
 resilience4j:
   circuitbreaker:
     instances:
-      productService:
+      default:
         failure-rate-threshold: 50
         minimum-number-of-calls: 5
         wait-duration-in-open-state: 10s
         sliding-window-size: 10
 
+
+# 📊 ACTUATOR + MONITORING
 management:
   endpoints:
     web:
@@ -65,6 +114,7 @@ management:
     sampling:
       probability: 1.0
 
+  # Uncomment when Zipkin is ready
   # zipkin:
   #   tracing:
   #     endpoint: http://localhost:9411/api/v2/spans
