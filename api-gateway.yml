@@ -13,8 +13,6 @@ spring:
       server:
         webflux:
           routes:
-
-            # 🔐 AUTH SERVICE
             - id: auth-service
               uri: lb://AUTH-SERVICE
               predicates:
@@ -22,7 +20,6 @@ spring:
               filters:
                 - RewritePath=/auth/(?<path>.*), /${path}
 
-            # 👤 USER SERVICE
             - id: user-service
               uri: lb://USER-SERVICE
               predicates:
@@ -30,7 +27,6 @@ spring:
               filters:
                 - RewritePath=/users/(?<path>.*), /${path}
 
-            # 🚀 STARTUP SERVICE
             - id: startup-service
               uri: lb://STARTUP-SERVICE
               predicates:
@@ -38,7 +34,6 @@ spring:
               filters:
                 - RewritePath=/startups/(?<path>.*), /${path}
 
-            # 💰 INVESTMENT SERVICE
             - id: investment-service
               uri: lb://INVESTMENT-SERVICE
               predicates:
@@ -46,7 +41,6 @@ spring:
               filters:
                 - RewritePath=/investments/(?<path>.*), /${path}
 
-            👥 TEAM SERVICE (UNCOMMENT WHEN READY)
             - id: team-service
               uri: lb://TEAM-SERVICE
               predicates:
@@ -54,7 +48,13 @@ spring:
               filters:
                 - RewritePath=/teams/(?<path>.*), /${path}
 
-            🔔 NOTIFICATION SERVICE (OPTIONAL)
+            - id: message-service
+              uri: lb://MESSAGE-SERVICE
+              predicates:
+                - Path=/messages/**
+              filters:
+                - RewritePath=/messages/(?<path>.*), /${path}
+
             - id: notification-service
               uri: lb://NOTIFICATION-SERVICE
               predicates:
@@ -63,7 +63,6 @@ spring:
                 - RewritePath=/notifications/(?<path>.*), /${path}
 
 
-# 🔥 CENTRALIZED SWAGGER CONFIG
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -78,11 +77,12 @@ springdoc:
         url: /investments/v3/api-docs
       - name: Team Service
         url: /teams/v3/api-docs
+      - name: Message Service
+        url: /messages/v3/api-docs
       - name: Notification Service
         url: /notifications/v3/api-docs
 
 
-# 🌐 EUREKA CONFIG
 eureka:
   client:
     service-url:
@@ -92,7 +92,6 @@ eureka:
     hostname: localhost
 
 
-# ⚡ RESILIENCE4J (CIRCUIT BREAKER)
 resilience4j:
   circuitbreaker:
     instances:
@@ -103,7 +102,6 @@ resilience4j:
         sliding-window-size: 10
 
 
-# 📊 ACTUATOR + MONITORING
 management:
   endpoints:
     web:
@@ -114,7 +112,7 @@ management:
     sampling:
       probability: 1.0
 
-  # Uncomment when Zipkin is ready
+  # Uncomment when Zipkin is working
   # zipkin:
   #   tracing:
   #     endpoint: http://localhost:9411/api/v2/spans
