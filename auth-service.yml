@@ -32,15 +32,26 @@ eureka:
   instance:
     prefer-ip-address: true
 
+# ✅ Swagger Config (ADDED)
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: false
+  show-actuator: false
+
 # Zipkin & Tracing (Micrometer)
 management:
   tracing:
     sampling:
-      probability: 1.0   # capture all requests (dev mode)
+      probability: 1.0
 
   zipkin:
     tracing:
       endpoint: http://localhost:9411/api/v2/spans
 
-# Actuator (optional but useful)
-management.endpoints.web.exposure.include: "*"
+  endpoints:
+    web:
+      exposure:
+        include: "*"
