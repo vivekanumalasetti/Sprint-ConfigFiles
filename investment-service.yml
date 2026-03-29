@@ -6,10 +6,12 @@ spring:
     url: jdbc:mysql://localhost:3306/founderlink_investments?createDatabaseIfNotExist=true
     username: root
     password: MySql@2026
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
       ddl-auto: update
+    show-sql: true
 
   rabbitmq:
     host: localhost
@@ -17,10 +19,22 @@ spring:
     username: guest
     password: guest
 
-rabbitmq:
-  exchange: founderlink.exchange
-
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+# Custom RabbitMQ Exchange
+rabbitmq:
+  exchange: founderlink.exchange
+
+# ✅ Swagger Config (ADDED)
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: false
+  show-actuator: false
