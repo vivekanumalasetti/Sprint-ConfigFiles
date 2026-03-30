@@ -52,7 +52,7 @@ spring:
                 - RewritePath=/teams/(?<path>.*), /${path}
 
             - id: message-service
-              uri: lb://MESSAGE-SERVICE
+              uri: lb://MESSAGING-SERVICE
               predicates:
                 - Path=/messages/**
               filters:
